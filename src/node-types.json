@@ -81,6 +81,10 @@
         {
           "type": "location",
           "named": true
+        },
+        {
+          "type": "map",
+          "named": true
         }
       ]
     }
@@ -256,6 +260,25 @@
     "fields": {}
   },
   {
+    "type": "map",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "block",
+          "named": true
+        },
+        {
+          "type": "var",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "mask",
     "named": true,
     "fields": {}
@@ -286,6 +309,10 @@
         },
         {
           "type": "location",
+          "named": true
+        },
+        {
+          "type": "map",
           "named": true
         }
       ]
@@ -431,6 +458,10 @@
     "named": false
   },
   {
+    "type": "map",
+    "named": false
+  },
+  {
     "type": "master_process",
     "named": false
   },
@@ -488,6 +519,10 @@
   },
   {
     "type": "value",
+    "named": true
+  },
+  {
+    "type": "var",
     "named": true
   },
   {

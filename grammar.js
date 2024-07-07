@@ -14,7 +14,9 @@ module.exports = grammar({
     _comment_content: () => /[^\n]*/,
 
     _body: ($) =>
-      repeat1(choice($.directive, $.block, $.attribute, $.location, $.if)),
+      repeat1(
+        choice($.directive, $.block, $.if, $.map, $.attribute, $.location),
+      ),
 
     random_value: (_) => token(prec(-1, /[^;\s]*/)), // https://github.com/tree-sitter/tree-sitter/issues/1655
 
@@ -32,7 +34,7 @@ module.exports = grammar({
       ),
     attribute: ($) =>
       seq(
-        alias($._word, $.keyword),
+        alias(choice($._word, "''"), $.keyword),
         choice(
           $.block,
           seq(
@@ -113,6 +115,13 @@ module.exports = grammar({
           repeat(choice(unicodeLetter, unicodeDigit, "-", "_")),
         ),
       ),
+    var: (_) =>
+      token(
+        seq(
+          choice(unicodeLetter, "$"),
+          repeat(choice(unicodeLetter, unicodeDigit, "_", "$")),
+        ),
+      ),
     string_literal: (_) => token(seq("'", repeat(/[^']|(\\\')/), "'")),
     numeric_literal: (_) =>
       token(
@@ -124,6 +133,8 @@ module.exports = grammar({
           ),
         ),
       ),
+
+    map: ($) => seq("map", repeat1(choice($.var, $._word)), $.block),
 
     _boolean_directive: ($) =>
       seq(
