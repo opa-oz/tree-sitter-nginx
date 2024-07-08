@@ -10,8 +10,7 @@ module.exports = grammar({
   conflicts: ($) => [[$.file, $.mask]],
   rules: {
     source_file: ($) => $._body,
-    comment: ($) => prec.left(seq("#", $._comment_content, $._newline)),
-    _comment_content: () => /[^\n]*/,
+    comment: (_) => prec.left(token(seq("#", /.*/))),
 
     _body: ($) =>
       repeat1(
@@ -22,6 +21,7 @@ module.exports = grammar({
 
     _attribute_value: ($) =>
       choice(
+        $.quoted_string_literal,
         $.string_literal,
         $.auto,
         $.level,
@@ -122,7 +122,9 @@ module.exports = grammar({
           repeat(choice(unicodeLetter, unicodeDigit, "_", "$")),
         ),
       ),
-    string_literal: (_) => token(seq("'", repeat(/[^']|(\\\')/), "'")),
+    quoted_string_literal: (_) =>
+      prec.right(token(seq("'", repeat(/[^']|(\\\')/), "'"))),
+    string_literal: (_) => token(seq('"', repeat(/[^"]|(\\\")/), '"')),
     numeric_literal: (_) =>
       token(
         seq(

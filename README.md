@@ -1,6 +1,6 @@
 # tree-sitter-nginx
 
-![example](docs/example.png)
+![example](./docs/example.png)
 
 
 ## Features

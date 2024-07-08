@@ -36,6 +36,10 @@
           "named": true
         },
         {
+          "type": "quoted_string_literal",
+          "named": true
+        },
+        {
           "type": "size",
           "named": true
         },
@@ -284,6 +288,11 @@
     "fields": {}
   },
   {
+    "type": "quoted_string_literal",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "source_file",
     "named": true,
     "fields": {},
@@ -336,10 +345,6 @@
         }
       ]
     }
-  },
-  {
-    "type": "#",
-    "named": false
   },
   {
     "type": "*",

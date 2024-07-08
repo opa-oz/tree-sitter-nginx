@@ -69,7 +69,7 @@ server {
               (attribute
                 (keyword)
                 (value)
-                (string_literal))
+                (quoted_string_literal))
               (attribute
                 (keyword)
                 (value)

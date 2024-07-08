@@ -2,7 +2,7 @@
 
 (value) @variable
 
-(attribute (keyword) @attribute) 
+(attribute (keyword) @attribute)
 
 [
   (location_modifier)
@@ -19,7 +19,7 @@
   "map"
 ] @keyword.conditional
 
-(directive (keyword) @constant) 
+(directive (keyword) @constant)
 
 (boolean) @boolean
 
@@ -34,6 +34,7 @@
 
 [
   (string_literal)
+  (quoted_string_literal)
   (file)
   (mask)
 ] @string
