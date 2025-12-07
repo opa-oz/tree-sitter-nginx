@@ -79,6 +79,10 @@
           "named": true
         },
         {
+          "type": "geo",
+          "named": true
+        },
+        {
           "type": "if",
           "named": true
         },
@@ -200,6 +204,25 @@
     "fields": {}
   },
   {
+    "type": "geo",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "block",
+          "named": true
+        },
+        {
+          "type": "var",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "if",
     "named": true,
     "fields": {
@@ -310,6 +333,10 @@
         },
         {
           "type": "directive",
+          "named": true
+        },
+        {
+          "type": "geo",
           "named": true
         },
         {
@@ -432,6 +459,10 @@
   },
   {
     "type": "eventport",
+    "named": false
+  },
+  {
+    "type": "geo",
     "named": false
   },
   {
