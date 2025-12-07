@@ -17,6 +17,7 @@
 [
   "if"
   "map"
+  "geo"
 ] @keyword.conditional
 
 (directive (keyword) @constant)
