@@ -14,10 +14,27 @@ module.exports = grammar({
 
     _body: ($) =>
       repeat1(
-        choice($.directive, $.block, $.if, $.map, $.attribute, $.location),
+        choice(
+          $.directive,
+          $.block,
+          $.if,
+          $.map,
+          $.geo,
+          $.attribute,
+          $.location,
+        ),
       ),
 
     random_value: (_) => token(prec(-1, /[^;\s]*/)), // https://github.com/tree-sitter/tree-sitter/issues/1655
+
+    _cidr: (_) =>
+      token(
+        choice(
+          /((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\/([0-9]|[12][0-9]|3[0-2]))?/,
+
+          /((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:)|(([0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,5}(:[0-9A-Fa-f]{1,4}){1,2})|(([0-9A-Fa-f]{1,4}:){1,4}(:[0-9A-Fa-f]{1,4}){1,3})|(([0-9A-Fa-f]{1,4}:){1,3}(:[0-9A-Fa-f]{1,4}){1,4})|(([0-9A-Fa-f]{1,4}:){1,2}(:[0-9A-Fa-f]{1,4}){1,5})|([0-9A-Fa-f]{1,4}:((:[0-9A-Fa-f]{1,4}){1,6}))|(:((:[0-9A-Fa-f]{1,4}){1,7}|:))|(([0-9A-Fa-f]{1,4}:){6}(([0-9]{1,3}\.){3}[0-9]{1,3}))|(([0-9A-Fa-f]{1,4}:){0,5}:[0-9A-Fa-f]{1,4}:(([0-9]{1,3}\.){3}[0-9]{1,3}))|(::([0-9A-Fa-f]{1,4}:){0,5}(([0-9]{1,3}\.){3}[0-9]{1,3})))(\/(12[0-8]|1[01][0-9]|[0-9]?[0-9]))?/,
+        ),
+      ),
 
     _attribute_value: ($) =>
       choice(
@@ -34,7 +51,7 @@ module.exports = grammar({
       ),
     attribute: ($) =>
       seq(
-        alias(choice($._word, "''"), $.keyword),
+        alias(choice($._cidr, $._word, "''"), $.keyword),
         choice(
           $.block,
           seq(
@@ -88,6 +105,9 @@ module.exports = grammar({
     off: (_) => "off",
     boolean: ($) => choice($.on, $.off),
     auto: (_) => "auto",
+
+    geo: ($) => seq("geo", repeat1($.var), $.block),
+
     cpumask: (_) => token(/[01]+/),
     connection_method: (_) =>
       choice("select", "poll", "kqueue", "epoll", "/dev/poll", "eventport"), // https://nginx.org/en/docs/events.html

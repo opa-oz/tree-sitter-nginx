@@ -516,3 +516,39 @@ map
             (keyword)
             (value)))))
 
+
+==================
+geo
+==================
+
+    geo $client_type {
+        default external;
+
+        10.0.0.1 internal;
+        10.0.0.0/24 internal;
+
+        ::1 internal;
+        ::1/128 internal;
+    }
+
+---
+
+    (source_file
+      (geo
+        (var)
+        (block
+          (attribute
+            (keyword)
+            (value))
+          (attribute
+            (keyword)
+            (value))
+          (attribute
+            (keyword)
+            (value))
+          (attribute
+            (keyword)
+            (value))
+          (attribute
+            (keyword)
+            (value)))))
