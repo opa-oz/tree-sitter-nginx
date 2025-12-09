@@ -362,6 +362,50 @@ error_log logs/error.log;
     )
 
 ==================
+access_log directive
+==================
+
+access_log logs/access.log;
+access_log logs/access.log format;
+access_log logs/access.log format buffer=32k;
+access_log logs/access.log format buffer=32k gzip=1;
+access_log logs/access.log format flush=5s;
+access_log logs/access.log format flush=5s if=$log;
+
+---
+
+    (source_file
+      (directive
+        (keyword)
+        (file))
+      (directive
+        (keyword)
+        (file)
+        (format))
+      (directive
+        (keyword)
+        (file)
+        (format)
+        (option))
+      (directive
+        (keyword)
+        (file)
+        (format)
+        (option)
+        (option))
+      (directive
+        (keyword)
+        (file)
+        (format)
+        (option))
+      (directive
+        (keyword)
+        (file)
+        (format)
+        (option)
+        (option)))
+
+==================
 ssl_engine directive
 ==================
 

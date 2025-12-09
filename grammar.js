@@ -77,6 +77,7 @@ module.exports = grammar({
         $._abstract_directive,
         $._env_directive,
         $._error_log_directive,
+        $._access_log_directive,
         $._thread_pool_directive,
         $._user_directive,
         $._events_directive,
@@ -269,6 +270,21 @@ module.exports = grammar({
         alias("error_log", $.keyword),
         $.file,
         optional(seq(/\s/, $.level)),
+        terminator,
+        $._newline,
+      ),
+
+    _access_log_directive: ($) =>
+      seq(
+        alias("access_log", $.keyword),
+        choice($.file, $.boolean),
+        optional(
+          seq(
+            /\s/,
+            alias(/[^;\s]+/, $.format),
+            optional(repeat(seq(/\s/, alias(/[^;\s]+/, $.option)))),
+          ),
+        ),
         terminator,
         $._newline,
       ),

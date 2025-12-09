@@ -101,10 +101,10 @@ http {
             (quoted_string_literal)
             (quoted_string_literal)
             (quoted_string_literal))
-          (attribute
+          (directive
             (keyword)
-            (value)
-            (value))
+            (file)
+            (format))
           (attribute
             (keyword)
             (boolean
@@ -197,7 +197,7 @@ events {
               (directive
                 (keyword)
                 (file))
-              (attribute
+              (directive
                 (keyword)
                 (boolean
                   (off)))
@@ -421,12 +421,12 @@ http {
             (keyword)
             (boolean
               (off)))
-          (attribute
+          (directive
             (keyword)
-            (value)
-            (value)
-            (value)
-            (value))
+            (file)
+            (format)
+            (option)
+            (option))
           (directive
             (keyword)
             (file))
