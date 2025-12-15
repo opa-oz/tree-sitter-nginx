@@ -160,6 +160,10 @@
           "named": true
         },
         {
+          "type": "format",
+          "named": true
+        },
+        {
           "type": "keyword",
           "named": true
         },
@@ -173,6 +177,10 @@
         },
         {
           "type": "numeric_literal",
+          "named": true
+        },
+        {
+          "type": "option",
           "named": true
         },
         {
@@ -435,6 +443,10 @@
     "named": false
   },
   {
+    "type": "format",
+    "named": true
+  },
+  {
     "type": "if",
     "named": false
   },
@@ -488,6 +500,10 @@
   },
   {
     "type": "on",
+    "named": true
+  },
+  {
+    "type": "option",
     "named": true
   },
   {
