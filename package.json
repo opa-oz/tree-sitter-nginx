@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-nginx",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "types": "bindings/node",
   "repository": "https://github.com/opa-oz/tree-sitter-nginx",
