@@ -1,4 +1,4 @@
-module github.com/tree-sitter/tree-sitter-YOUR_LANGUAGE_NAME
+module github.com/tree-sitter/tree-sitter-nginx
 
 go 1.22
 

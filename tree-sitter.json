@@ -1,0 +1,41 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "nginx",
+      "camelcase": "NginX",
+      "title": "nginx",
+      "scope": "source.nginx",
+      "file-types": [
+        "nginx"
+      ],
+      "injection-regex": "^nginx$",
+      "class-name": "TreeSitterNginx"
+    }
+  ],
+  "metadata": {
+    "version": "1.0.1",
+    "license": "MIT",
+    "description": "Grammar for NGinx config",
+    "authors": [
+      {
+        "name": "Vladimir <opa_oz> Levin",
+        "email": "opaozhub@protonmail.com",
+        "url": "https://github.com/opa-oz"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/opa-oz/tree-sitter-nginx",
+      "funding": "https://ko-fi.com/opa_oz"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true,
+    "zig": false
+  }
+}
