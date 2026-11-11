@@ -1,0 +1,160 @@
+==================
+block on one line
+==================
+
+server { listen 80; }
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal)))))
+
+==================
+nested blocks on one line
+==================
+
+http { server { listen 80; location / { return 200; } } }
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (block
+      (attribute
+        (keyword)
+        (block
+          (attribute
+            (keyword)
+            (numeric_literal))
+          (location
+            (location_route)
+            (block
+              (directive
+                (keyword)
+                (numeric_literal)))))))))
+
+==================
+directives on one line
+==================
+
+worker_processes 1; pid /run/nginx.pid;
+
+---
+
+(source_file
+  (directive
+    (keyword)
+    (numeric_literal))
+  (directive
+    (keyword)
+    (file)))
+
+==================
+directives on one line inside a block
+==================
+
+server {
+    listen 80; server_name example.com;
+}
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (value)))))
+
+==================
+events block on one line
+==================
+
+events { worker_connections 64; }
+
+---
+
+(source_file
+  (directive
+    (keyword)
+    (block
+      (directive
+        (keyword)
+        (numeric_literal)))))
+
+==================
+map block on one line
+==================
+
+map $host $backend { default 0; example.com 1; }
+
+---
+
+(source_file
+  (map
+    (var)
+    (var)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (value)
+        (numeric_literal)))))
+
+==================
+if block on one line
+==================
+
+location / {
+    if ($request_method = POST) { return 405; }
+    return 200;
+}
+
+---
+
+(source_file
+  (location
+    (location_route)
+    (block
+      (if
+        condition: (condition)
+        (block
+          (directive
+            (keyword)
+            (numeric_literal))))
+      (directive
+        (keyword)
+        (numeric_literal)))))
+
+==================
+closing braces on one line
+==================
+
+server {
+    location / {
+        return 200; } }
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (block
+      (location
+        (location_route)
+        (block
+          (directive
+            (keyword)
+            (numeric_literal)))))))
