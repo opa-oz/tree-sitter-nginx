@@ -140,6 +140,15 @@
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
+            "name": "_digit_word"
+          },
+          "named": true,
+          "value": "value"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
             "name": "random_value"
           },
           "named": true,
@@ -162,6 +171,18 @@
               {
                 "type": "STRING",
                 "value": "''"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "string_literal"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "quoted_string_literal"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_entry_word"
               }
             ]
           },
@@ -199,8 +220,26 @@
                   }
                 },
                 {
-                  "type": "STRING",
-                  "value": ";"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "STRING",
+                      "value": ";"
+                    },
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "PATTERN",
+                          "value": "\\s"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "block"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -884,6 +923,20 @@
             ]
           }
         ]
+      }
+    },
+    "_digit_word": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[0-9][^;\\s]*"
+      }
+    },
+    "_entry_word": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^\\p{L}\\s;{}#\"'][^;\\s]*"
       }
     },
     "map": {

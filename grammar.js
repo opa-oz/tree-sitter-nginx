@@ -33,17 +33,27 @@ module.exports = grammar({
 				$.size,
 				$.time,
 				$.numeric_literal,
+				alias($._digit_word, $.value),
 				alias($.random_value, $.value),
 			),
 		attribute: ($) =>
 			seq(
-				alias(choice($._word, "''"), $.keyword),
+				alias(
+					choice(
+						$._word,
+						"''",
+						$.string_literal,
+						$.quoted_string_literal,
+						$._entry_word,
+					),
+					$.keyword,
+				),
 				choice(
 					$.block,
 					seq(
 						$._attribute_value,
 						repeat(seq(/\s/, $._attribute_value)),
-						terminator,
+						choice(terminator, seq(/\s/, $.block)),
 					),
 				),
 				optional($._newline),
@@ -138,6 +148,12 @@ module.exports = grammar({
 					),
 				),
 			),
+		// A word that starts with a digit and is not a number, time or size, such as an
+		// address: 127.0.0.1:8080, 10.0.0.0/8. Defined after those so that they win a tie.
+		_digit_word: (_) => token(/[0-9][^;\s]*/),
+		// An entry of a map, geo or split_clients block starts with any word, not only with
+		// a letter: 10.0.0.0/8, ::1, ~^/api, *.example.com, /old, 200, 0.5%
+		_entry_word: (_) => token(/[^\p{L}\s;{}#"'][^;\s]*/),
 
 		map: ($) => seq("map", repeat1(choice($.var, $._word)), $.block),
 
