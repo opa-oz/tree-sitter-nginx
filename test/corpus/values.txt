@@ -1,0 +1,87 @@
+==================
+address values
+==================
+
+resolver 1.1.1.1;
+listen 127.0.0.1:8080;
+allow 10.0.0.0/8;
+allow 2001:db8::/32;
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value))
+  (attribute
+    (keyword)
+    (value))
+  (attribute
+    (keyword)
+    (value))
+  (attribute
+    (keyword)
+    (value)))
+
+==================
+address followed by parameters
+==================
+
+server 127.0.0.1:8000 weight=5 max_fails=3;
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (value)
+    (value)))
+
+==================
+word that starts with a digit
+==================
+
+add_header X-Version 1.2.3;
+proxy_read_timeout 1h30m;
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (value))
+  (attribute
+    (keyword)
+    (value)))
+
+==================
+numbers, times and sizes stay what they are
+==================
+
+listen 8080;
+keepalive_timeout 65s;
+client_max_body_size 10m;
+proxy_buffers 8 16k;
+gzip_http_version 1.1;
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (numeric_literal))
+  (attribute
+    (keyword)
+    (time))
+  (attribute
+    (keyword)
+    (time))
+  (attribute
+    (keyword)
+    (numeric_literal)
+    (size))
+  (attribute
+    (keyword)
+    (numeric_literal)))

@@ -1,0 +1,111 @@
+==================
+map keys
+==================
+
+map $uri $kind {
+    default 0;
+    ~^/api 1;
+    /old 2;
+    "a b" 3;
+    'c d' 4;
+}
+
+---
+
+(source_file
+  (map
+    (var)
+    (var)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal)))))
+
+==================
+map keys with a wildcard
+==================
+
+map $host $site {
+    default 0;
+    *.example.com 1;
+    .example.org 2;
+}
+
+---
+
+(source_file
+  (map
+    (var)
+    (var)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal)))))
+
+==================
+map keys that are numbers
+==================
+
+map $status $loggable {
+    default 1;
+    200 0;
+    304 0;
+}
+
+---
+
+(source_file
+  (map
+    (var)
+    (var)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal))
+      (attribute
+        (keyword)
+        (numeric_literal)))))
+
+==================
+quoted map key and value
+==================
+
+map $http_origin $allowed {
+    default "";
+    "api.internal" "api.internal";
+}
+
+---
+
+(source_file
+  (map
+    (var)
+    (var)
+    (block
+      (attribute
+        (keyword)
+        (string_literal))
+      (attribute
+        (keyword)
+        (string_literal)))))

@@ -1,0 +1,152 @@
+==================
+block with a parameter
+==================
+
+upstream app {
+    server 127.0.0.1:8000;
+    server unix:/run/app.sock backup;
+}
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (block
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (value)
+        (value)))))
+
+==================
+block with two parameters
+==================
+
+split_clients "${remote_addr}AAA" $variant {
+    0.5% .one;
+    2.0% .two;
+    * "";
+}
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (string_literal)
+    (value)
+    (block
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (string_literal)))))
+
+==================
+block with parameters inside a location
+==================
+
+location / {
+    limit_except GET POST {
+        deny all;
+    }
+}
+
+---
+
+(source_file
+  (location
+    (location_route)
+    (block
+      (attribute
+        (keyword)
+        (value)
+        (value)
+        (block
+          (attribute
+            (keyword)
+            (value)))))))
+
+==================
+block with a parameter on one line
+==================
+
+upstream app { server 127.0.0.1:8000; }
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (block
+      (attribute
+        (keyword)
+        (value)))))
+
+==================
+geo block
+==================
+
+geo $client_type {
+    default external;
+
+    10.0.0.0/8 internal;
+    172.16.0.0/12 internal;
+    192.168.0.0/16 internal;
+}
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (block
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (value)))))
+
+==================
+geo block with IPv6 addresses
+==================
+
+geo $client_type {
+    default external;
+    ::1 internal;
+    2001:db8::/32 internal;
+}
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (block
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (value))
+      (attribute
+        (keyword)
+        (value)))))

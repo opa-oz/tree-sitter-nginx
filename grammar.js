@@ -1,7 +1,14 @@
 const terminator = ";",
 	softTerminator = choice(terminator),
 	unicodeLetter = /\p{L}/,
-	unicodeDigit = /[0-9]/;
+	unicodeDigit = /[0-9]/,
+	// As ngx_conf_read_token reads a word: it ends at whitespace, ";" or "{" ("{" stays in
+	// a "${...}" variable), "\" escapes the next character, and a quote opens a quoted
+	// word only at its start.
+	wordChar = choice(/[^\s;{$\\]/, /\\(.|\n)?/, /\$\{?/),
+	wordStart = choice(/[^\s;{"'$\\]/, /\\(.|\n)?/, /\$\{?/),
+	quotedWord = choice(/"([^"\\]|\\(.|\n))*"/, /'([^'\\]|\\(.|\n))*'/),
+	word = choice(quotedWord, seq(wordStart, repeat(wordChar)));
 
 module.exports = grammar({
 	name: "nginx",
@@ -20,7 +27,7 @@ module.exports = grammar({
 				choice($.directive, $.block, $.if, $.map, $.attribute, $.location),
 			),
 
-		random_value: (_) => token(prec(-1, /[^;\s]*/)), // https://github.com/tree-sitter/tree-sitter/issues/1655
+		random_value: (_) => token(prec(-1, choice(quotedWord, repeat(wordChar)))), // https://github.com/tree-sitter/tree-sitter/issues/1655
 
 		_attribute_value: ($) =>
 			choice(
@@ -33,26 +40,36 @@ module.exports = grammar({
 				$.size,
 				$.time,
 				$.numeric_literal,
+				alias($._digit_word, $.value),
 				alias($.random_value, $.value),
 			),
 		attribute: ($) =>
 			seq(
-				alias(choice($._word, "''"), $.keyword),
+				alias(
+					choice(
+						$._word,
+						"''",
+						$.string_literal,
+						$.quoted_string_literal,
+						$._entry_word,
+					),
+					$.keyword,
+				),
 				choice(
 					$.block,
 					seq(
 						$._attribute_value,
 						repeat(seq(/\s/, $._attribute_value)),
-						terminator,
+						choice(terminator, seq(/\s/, $.block), $.block),
 					),
 				),
-				$._newline,
+				optional($._newline),
 			),
 
-		condition: (_) => token(seq("(", repeat(/[^)]|(\\\))/), ")")),
+		condition: (_) => token(seq("(", repeat(choice(/\s/, word)), ")")),
 		if: ($) => seq("if", field("condition", $.condition), $.block),
 
-		location_route: (_) => token(prec(-1, /[^{]+/)),
+		location_route: (_) => token(prec(-1, seq(word, repeat(choice(/\s/, word))))),
 		location_modifier: (_) =>
 			choice(
 				"=", // An exact match of the URI path.
@@ -138,15 +155,36 @@ module.exports = grammar({
 					),
 				),
 			),
+		// A word that starts with a digit and is not a number, time or size, such as an
+		// address: 127.0.0.1:8080, 10.0.0.0/8. Defined after those so that they win a tie.
+		_digit_word: (_) => token(seq(/[0-9]/, repeat(wordChar))),
+		// An entry of a map, geo or split_clients block starts with any word, not only with
+		// a letter: 10.0.0.0/8, ::1, ~^/api, *.example.com, /old, 200, 0.5%
+		_entry_word: (_) => token(seq(/[^\p{L}\s;{}#"']/, repeat(wordChar))),
 
-		map: ($) => seq("map", repeat1(choice($.var, $._word)), $.block),
+		map: ($) =>
+			seq(
+				"map",
+				optional(
+					choice(
+						$.string_literal,
+						$.quoted_string_literal,
+						alias($._map_source_word, $.value),
+					),
+				),
+				repeat1(choice($.var, $._word)),
+				$.block,
+			),
+		// A map source that is neither one variable nor one plain word, such as
+		// $scheme:$host. Defined after var and _word so that they win a tie.
+		_map_source_word: (_) => token(seq(wordStart, repeat(wordChar))),
 
 		_boolean_directive: ($) =>
 			seq(
 				alias($._boolean_keyword, $.keyword),
 				$.boolean,
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 		_boolean_keyword: (_) =>
 			choice(
@@ -158,7 +196,12 @@ module.exports = grammar({
 			),
 
 		_time_directive: ($) =>
-			seq(alias($._time_keyword, $.keyword), $.time, terminator, $._newline),
+			seq(
+				alias($._time_keyword, $.keyword),
+				$.time,
+				terminator,
+				optional($._newline),
+			),
 		_time_keyword: (_) =>
 			choice(
 				"accept_mutex_delay",
@@ -171,7 +214,7 @@ module.exports = grammar({
 				alias($._number_keyword, $.keyword),
 				$.numeric_literal,
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 		_number_keyword: (_) =>
 			choice(
@@ -182,7 +225,12 @@ module.exports = grammar({
 			),
 
 		_file_directive: ($) =>
-			seq(alias($._file_keyword, $.keyword), $.file, terminator, $._newline),
+			seq(
+				alias($._file_keyword, $.keyword),
+				$.file,
+				terminator,
+				optional($._newline),
+			),
 		_file_keyword: (_) => choice("load_module", "lock_file", "pid"),
 
 		_include_directive: ($) =>
@@ -190,7 +238,7 @@ module.exports = grammar({
 				alias("include", $.keyword),
 				choice($.file, $.mask),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_number_or_auto_directive: ($) =>
@@ -198,7 +246,7 @@ module.exports = grammar({
 				alias("worker_processes", $.keyword),
 				choice($.numeric_literal, $.auto),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_debug_points_directive: ($) =>
@@ -206,7 +254,7 @@ module.exports = grammar({
 				alias("debug_points", $.keyword),
 				alias(choice("abort", "stop"), $.constant),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_use_directive: ($) =>
@@ -214,7 +262,7 @@ module.exports = grammar({
 				alias("use", $.keyword),
 				alias($.connection_method, $.constant),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_working_directory_directive: ($) =>
@@ -222,7 +270,7 @@ module.exports = grammar({
 				alias("working_directory", $.keyword),
 				$.file,
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_working_core_directive: ($) =>
@@ -230,7 +278,7 @@ module.exports = grammar({
 				alias("worker_rlimit_core", $.keyword),
 				$.size,
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_affinity_directive: ($) =>
@@ -238,7 +286,7 @@ module.exports = grammar({
 				alias("worker_cpu_affinity", $.keyword),
 				seq(choice($.auto, $.cpumask), repeat(choice($.auto, $.cpumask))),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_abstract_directive: ($) =>
@@ -246,7 +294,7 @@ module.exports = grammar({
 				alias(choice("debug_connection", "ssl_engine"), $.keyword),
 				alias(/[^;]+/, $.value),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_return_directive: ($) =>
@@ -255,7 +303,7 @@ module.exports = grammar({
 				$.numeric_literal,
 				optional(alias($.random_value, $.value)),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_env_directive: ($) =>
@@ -264,7 +312,7 @@ module.exports = grammar({
 				alias(/[A-Z][A-Z0-9_]+/, $.variable),
 				optional(seq("=", alias(/[^;]+/, $.value))),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_error_log_directive: ($) =>
@@ -273,7 +321,7 @@ module.exports = grammar({
 				$.file,
 				optional(seq(/\s/, $.level)),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_thread_poll_variable: ($) =>
@@ -290,7 +338,7 @@ module.exports = grammar({
 				alias($._thread_poll_variable, $.variable),
 				optional(seq(/\s/, alias($._thread_poll_variable, $.variable))),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_user_directive: ($) =>
@@ -299,7 +347,7 @@ module.exports = grammar({
 				alias($._word, $.value),
 				optional(alias($._word, $.value)),
 				terminator,
-				$._newline,
+				optional($._newline),
 			),
 
 		_events_directive: ($) =>
