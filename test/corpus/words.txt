@@ -1,0 +1,135 @@
+==================
+block right after a parameter
+==================
+
+upstream app{
+    server unix:/run/app.sock;
+}
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (block
+      (attribute
+        (keyword)
+        (value)))))
+
+==================
+map with a quoted source
+==================
+
+map "$scheme:$host" $site {
+    default 0;
+}
+
+---
+
+(source_file
+  (map
+    (string_literal)
+    (var)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal)))))
+
+==================
+map with a source of two variables
+==================
+
+map $scheme:$host $site {
+    default 0;
+}
+
+---
+
+(source_file
+  (map
+    (value)
+    (var)
+    (block
+      (attribute
+        (keyword)
+        (numeric_literal)))))
+
+==================
+location with a quoted regex
+==================
+
+location ~ "^/[a-z]{2}/" {
+    return 200;
+}
+
+---
+
+(source_file
+  (location
+    (location_modifier)
+    (location_route)
+    (block
+      (directive
+        (keyword)
+        (numeric_literal)))))
+
+==================
+if with a quoted regex
+==================
+
+if ($http_user_agent ~* "(bot|crawl)") {
+    return 403;
+}
+
+---
+
+(source_file
+  (if
+    condition: (condition)
+    (block
+      (directive
+        (keyword)
+        (numeric_literal)))))
+
+==================
+if with parentheses in a regex
+==================
+
+if ($uri ~ ^/(a|b)$) {
+    return 403;
+}
+
+---
+
+(source_file
+  (if
+    condition: (condition)
+    (block
+      (directive
+        (keyword)
+        (numeric_literal)))))
+
+==================
+brace inside quotes and variables
+==================
+
+set $name app;
+add_header X-Name ${name}x;
+return 200 "a{b";
+
+---
+
+(source_file
+  (attribute
+    (keyword)
+    (value)
+    (value))
+  (attribute
+    (keyword)
+    (value)
+    (value))
+  (directive
+    (keyword)
+    (numeric_literal)
+    (value)))

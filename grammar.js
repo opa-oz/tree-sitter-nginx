@@ -1,7 +1,14 @@
 const terminator = ";",
 	softTerminator = choice(terminator),
 	unicodeLetter = /\p{L}/,
-	unicodeDigit = /[0-9]/;
+	unicodeDigit = /[0-9]/,
+	// As ngx_conf_read_token reads a word: it ends at whitespace, ";" or "{" ("{" stays in
+	// a "${...}" variable), "\" escapes the next character, and a quote opens a quoted
+	// word only at its start.
+	wordChar = choice(/[^\s;{$\\]/, /\\(.|\n)?/, /\$\{?/),
+	wordStart = choice(/[^\s;{"'$\\]/, /\\(.|\n)?/, /\$\{?/),
+	quotedWord = choice(/"([^"\\]|\\(.|\n))*"/, /'([^'\\]|\\(.|\n))*'/),
+	word = choice(quotedWord, seq(wordStart, repeat(wordChar)));
 
 module.exports = grammar({
 	name: "nginx",
@@ -20,7 +27,7 @@ module.exports = grammar({
 				choice($.directive, $.block, $.if, $.map, $.attribute, $.location),
 			),
 
-		random_value: (_) => token(prec(-1, /[^;\s]*/)), // https://github.com/tree-sitter/tree-sitter/issues/1655
+		random_value: (_) => token(prec(-1, choice(quotedWord, repeat(wordChar)))), // https://github.com/tree-sitter/tree-sitter/issues/1655
 
 		_attribute_value: ($) =>
 			choice(
@@ -53,16 +60,16 @@ module.exports = grammar({
 					seq(
 						$._attribute_value,
 						repeat(seq(/\s/, $._attribute_value)),
-						choice(terminator, seq(/\s/, $.block)),
+						choice(terminator, seq(/\s/, $.block), $.block),
 					),
 				),
 				optional($._newline),
 			),
 
-		condition: (_) => token(seq("(", repeat(/[^)]|(\\\))/), ")")),
+		condition: (_) => token(seq("(", repeat(choice(/\s/, word)), ")")),
 		if: ($) => seq("if", field("condition", $.condition), $.block),
 
-		location_route: (_) => token(prec(-1, /[^{]+/)),
+		location_route: (_) => token(prec(-1, seq(word, repeat(choice(/\s/, word))))),
 		location_modifier: (_) =>
 			choice(
 				"=", // An exact match of the URI path.
@@ -150,12 +157,27 @@ module.exports = grammar({
 			),
 		// A word that starts with a digit and is not a number, time or size, such as an
 		// address: 127.0.0.1:8080, 10.0.0.0/8. Defined after those so that they win a tie.
-		_digit_word: (_) => token(/[0-9][^;\s]*/),
+		_digit_word: (_) => token(seq(/[0-9]/, repeat(wordChar))),
 		// An entry of a map, geo or split_clients block starts with any word, not only with
 		// a letter: 10.0.0.0/8, ::1, ~^/api, *.example.com, /old, 200, 0.5%
-		_entry_word: (_) => token(/[^\p{L}\s;{}#"'][^;\s]*/),
+		_entry_word: (_) => token(seq(/[^\p{L}\s;{}#"']/, repeat(wordChar))),
 
-		map: ($) => seq("map", repeat1(choice($.var, $._word)), $.block),
+		map: ($) =>
+			seq(
+				"map",
+				optional(
+					choice(
+						$.string_literal,
+						$.quoted_string_literal,
+						alias($._map_source_word, $.value),
+					),
+				),
+				repeat1(choice($.var, $._word)),
+				$.block,
+			),
+		// A map source that is neither one variable nor one plain word, such as
+		// $scheme:$host. Defined after var and _word so that they win a tie.
+		_map_source_word: (_) => token(seq(wordStart, repeat(wordChar))),
 
 		_boolean_directive: ($) =>
 			seq(

@@ -277,6 +277,18 @@
           "named": true
         },
         {
+          "type": "quoted_string_literal",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        },
+        {
           "type": "var",
           "named": true
         }
